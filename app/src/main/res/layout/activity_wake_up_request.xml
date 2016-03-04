@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinator_wake_up"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".presentation.WakeUpRequestActivity">
+
+<RelativeLayout
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@color/colorPrimary"
+    tools:context="co.com.acktos.ubimoviltaxista.presentation.WakeUpRequestActivity">
+
+
+    <!--<ImageView
+        android:layout_width="333dp"
+        android:layout_height="49dp"
+        android:src="@drawable/logo_ubimovil"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/img_car_wakeup"/>-->
+
+    <ImageView
+        android:id="@+id/img_car_wakeup"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:tint="@color/white"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/taxi_icon"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/progress_wakeup"/>
+
+    <!--style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"-->
+    <me.zhanghai.android.materialprogressbar.MaterialProgressBar
+        android:id="@+id/progress_wakeup"
+        android:layout_width="200dp"
+        android:layout_height="10dp"
+        android:indeterminate="true"
+        android:layout_marginBottom="24dp"
+        android:layout_marginTop="24dp"
+        app:mpb_progressStyle="horizontal"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:tint="@color/white"
+        style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal" />
+
+    <android.support.v7.widget.GridLayout
+
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        app:columnCount="7"
+        app:orientation="horizontal"
+        app:rowCount="7"
+        android:layout_below="@+id/progress_wakeup"
+        android:layout_centerHorizontal="true">
+
+    <!-- ROW 2 -->
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:tint="@color/colorPrimaryText"
+        android:src="@drawable/ic_schedule_24dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginRight="5dp"
+        app:layout_column="0"
+        app:layout_row="0"
+        app:layout_columnWeight="1"/>
+
+    <TextView
+        android:text="Distance"
+        android:textColor="@color/colorSemiWhite"
+        app:layout_column="1"
+        app:layout_row="0"
+        android:textSize="16sp"
+        app:layout_columnWeight="1"/>
+
+
+    <TextView
+        android:id="@+id/lbl_distance"
+        android:text="300 Meters"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:textColor="@color/colorSemiWhite"
+        android:gravity="end"
+        app:layout_column="2"
+        app:layout_row="0"
+        app:layout_columnWeight="5"/>
+
+    </android.support.v7.widget.GridLayout>
+
+
+    <Button
+        android:id="@+id/btn_accept_service"
+        android:layout_width="match_parent"
+        android:theme="@style/WhiteButton"
+        android:layout_height="60dp"
+        android:text="@string/accept"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>
+
+</android.support.design.widget.CoordinatorLayout>
