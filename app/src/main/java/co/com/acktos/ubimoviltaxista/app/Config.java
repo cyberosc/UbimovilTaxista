@@ -46,7 +46,10 @@ public class Config {
         GET_SERVICES("http://192.34.58.49/get_services_driver/"),
         UPDATE_SERVICE_STATE("http://192.34.58.49/update_state/"),
         SET_CAR("http://192.34.58.49/assign_car/"),
-        ASSIGN_SERVICE("http://192.34.58.49/assign_service/");
+        ASSIGN_SERVICE("http://192.34.58.49/assign_service/"),
+        REGISTER_GCM_ID("http://192.34.58.49/update_mobileid/"),
+        DRIVER_ALARM("http://192.34.58.49/driver_alarm/"),
+        ADD_CREDIT("http://192.34.58.49/add_credit/");
 
 
         private final String url;
@@ -86,6 +89,9 @@ public class Config {
     public final static String KEY_DRIVER="driver";
     public final static String KEY_DISTANCE="distance";
     public static final String KEY_STATE = "state";
+    public final static String KEY_DRIVER_ID="driver_id";
+    public final static String KEY_GCM_ID="register_number";
+    public final static String KEY_PANIC="panic";
 
 
     //FIREBASE
@@ -96,6 +102,8 @@ public class Config {
     public final static String KEY_UPDATE_DATE="updateDate";
     public final static String TABLE_DRIVERS="drivers";
     public final static String TABLE_SERVICES="services";
+    public final static String TABLE_ALARMS="alarms";
+
 
     //STATES
 

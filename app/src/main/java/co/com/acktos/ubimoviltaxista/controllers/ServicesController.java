@@ -88,6 +88,7 @@ public class ServicesController {
                                         servicesObject.getJSONArray(Config.KEY_FIELDS).toString(),
                                         listType);
 
+
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }

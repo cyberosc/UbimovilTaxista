@@ -3,14 +3,22 @@ package co.com.acktos.ubimoviltaxista.presentation;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
+import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
-import android.support.v7.widget.DefaultItemAnimator;
+import android.os.Handler;
+import android.os.Vibrator;
+import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.android.volley.Response;
@@ -18,19 +26,17 @@ import com.android.volley.VolleyError;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import co.com.acktos.ubimoviltaxista.R;
-import co.com.acktos.ubimoviltaxista.android.DividerItemDecoration;
 import co.com.acktos.ubimoviltaxista.app.Config;
-import co.com.acktos.ubimoviltaxista.app.MaterialSimpleListAdapter;
-import co.com.acktos.ubimoviltaxista.app.MaterialSimpleListItem;
 import co.com.acktos.ubimoviltaxista.controllers.ServicesController;
 import co.com.acktos.ubimoviltaxista.gcm.RegistrationIntentService;
 import co.com.acktos.ubimoviltaxista.models.Service;
-import co.com.acktos.ubimoviltaxista.presentation.adapters.CarsAdapter;
 import co.com.acktos.ubimoviltaxista.presentation.adapters.ServicesAdapter;
 import co.com.acktos.ubimoviltaxista.receivers.AlarmReceiver;
+import co.com.acktos.ubimoviltaxista.services.SendAlarmService;
 
 public class MainActivity extends AppCompatActivity implements ServicesAdapter.OnRecyclerViewClickListener {
 
@@ -49,12 +55,12 @@ public class MainActivity extends AppCompatActivity implements ServicesAdapter.O
     ServicesController servicesController;
 
 
-
     //UI References
     private RecyclerView servicesRecyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private RecyclerView.Adapter recyclerAdapter;
-
+    private View emptyStateView;
+    private FloatingActionButton fabAlarm;
 
 
 
@@ -63,17 +69,97 @@ public class MainActivity extends AppCompatActivity implements ServicesAdapter.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         //Initialize Components
         servicesController=new ServicesController(this);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 
         //Initialize UI
+        fabAlarm=(FloatingActionButton)findViewById(R.id.fab_alarm);
+        emptyStateView=findViewById(R.id.empty_services);
         servicesRecyclerView = (RecyclerView) findViewById(R.id.recycler_services);
         servicesRecyclerView.setHasFixedSize(true);
+
         //servicesRecyclerView.addItemDecoration(new DividerItemDecoration(this, null));
         //servicesRecyclerView.setItemAnimator(new DefaultItemAnimator());
         layoutManager = new LinearLayoutManager(this);
         servicesRecyclerView.setLayoutManager(layoutManager);
+
+
+        //Setup FAB
+
+
+        fabAlarm.setOnTouchListener(new View.OnTouchListener() {
+
+            private int longClickDuration = 4000;
+            private boolean isLongPress = false;
+            private Handler longClickHandler=new Handler();
+            private Runnable actionLongClick=new Runnable() {
+                @Override
+                public void run() {
+
+                    Log.i(Config.DEBUG_TAG, "run(), isLongPress:"+isLongPress);
+
+                    if (isLongPress) {
+
+                        fabAlarm.setImageDrawable(ContextCompat.getDrawable(
+                                MainActivity.this, R.drawable.ic_alarm_white_24px));
+                        fabAlarm.setBackgroundTintList(
+                                ColorStateList.valueOf(getResources().getColor(R.color.color_red_material)));
+
+                        Intent sendAlarmIntent= new Intent(MainActivity.this, SendAlarmService.class);
+                        startService(sendAlarmIntent);
+
+                        fabAlarm.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                fabAlarm.setImageDrawable(ContextCompat.getDrawable(
+                                        MainActivity.this, R.drawable.ic_alarm_24px));
+                                fabAlarm.setBackgroundTintList(
+                                        ColorStateList.valueOf(getResources().getColor(R.color.color_fab_alarm)));
+                            }
+                        }, 4000);
+
+                        Toast.makeText(MainActivity.this, getString(R.string.msg_send_alarm), Toast.LENGTH_LONG).show();
+                        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                        vibrator.vibrate(100);
+                    }
+                }
+            };
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+
+                    fabAlarm.callOnClick();
+                    isLongPress = true;
+
+                    Log.i(Config.DEBUG_TAG, "onTouch: action down, isLongPress:"+isLongPress);
+
+                    Handler handler = new Handler();
+                    longClickHandler.postDelayed(actionLongClick, longClickDuration);
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+
+                    longClickHandler.removeCallbacks(actionLongClick);
+                    isLongPress = false;
+                    Log.i(Config.DEBUG_TAG, "onTouch: action up, isLongPress:"+isLongPress);
+
+                }
+                return true;
+            }
+        });
+
+        /*fabAlarm.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                Toast.makeText(MainActivity.this, "FAB long press", Toast.LENGTH_LONG).show();
+                return false;
+            }
+        });*/
+
 
         if (checkPlayServices()) {
             // Start IntentService to register this application with GCM.
@@ -84,10 +170,6 @@ public class MainActivity extends AppCompatActivity implements ServicesAdapter.O
 
         AlarmReceiver alarmReceiver=new AlarmReceiver(this);
         alarmReceiver.setAlarm();
-
-
-
-
 
     }
 
@@ -100,31 +182,18 @@ public class MainActivity extends AppCompatActivity implements ServicesAdapter.O
     protected void onResume() {
         super.onResume();
 
-
-        getServices();
-
         setupBroadCastReceiver();
-
-
-        if (checkPlayServices()) {
-
-            if(!isGcmRegisterInProgress){
-                // Start IntentService to register this application with GCM.
-                isGcmRegisterInProgress=true;
-                Intent intent = new Intent(this, RegistrationIntentService.class);
-                startService(intent);
-            }
-        }
-
-
-
+        getServices();
+        checkPlayServices();
     }
+
+
+
 
     @Override
     protected void onStop() {
         super.onStop();
     }
-
 
     private void getServices(){
 
@@ -133,20 +202,29 @@ public class MainActivity extends AppCompatActivity implements ServicesAdapter.O
             public void onResponse(List<Service> services) {
 
                 if(services!=null){
-                    mServices = services;
                     Log.i(Config.DEBUG_TAG, "on response get cars:" + services.size());
+                    mServices = services;
+                    emptyStateView.setVisibility(View.GONE);
                     recyclerAdapter = new ServicesAdapter(MainActivity.this, services, MainActivity.this);
                     servicesRecyclerView.setAdapter(recyclerAdapter);
                 }else{
-                    Log.i(Config.DEBUG_TAG,"(getServices-MainActivity) services is null");
-                }
 
+                    List<Service> emptyServices=new ArrayList<>();
+                    recyclerAdapter = new ServicesAdapter(MainActivity.this, emptyServices, MainActivity.this);
+                    servicesRecyclerView.setAdapter(recyclerAdapter);
+                    Log.i(Config.DEBUG_TAG, "(getServices-MainActivity) services is null");
+                    emptyStateView.setVisibility(View.VISIBLE);
+                }
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-
+                final Snackbar mSnackBar= Snackbar
+                        .make(
+                                servicesRecyclerView,
+                                R.string.msg_error_occurred,
+                                Snackbar.LENGTH_LONG);
             }
         });
     }
@@ -171,7 +249,6 @@ public class MainActivity extends AppCompatActivity implements ServicesAdapter.O
             }
         };
     }
-
 
     /**
      * Check the device to make sure it has the Google Play Services APK. If

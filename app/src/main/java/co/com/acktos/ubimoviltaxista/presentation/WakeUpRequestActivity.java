@@ -27,6 +27,7 @@ public class WakeUpRequestActivity extends AppCompatActivity {
     //UI References
 
     private Button btnAcceptService;
+    private Button btnCancelService;
     private CoordinatorLayout coordinatorLayout;
     private TextView lblDistance;
 
@@ -52,6 +53,7 @@ public class WakeUpRequestActivity extends AppCompatActivity {
 
         //Initialize UI
         btnAcceptService=(Button)findViewById(R.id.btn_accept_service);
+        btnCancelService=(Button)findViewById(R.id.btn_cancel_service);
         coordinatorLayout=(CoordinatorLayout) findViewById(R.id.coordinator_wake_up);
         lblDistance=(TextView) findViewById(R.id.lbl_distance);
 
@@ -85,6 +87,14 @@ public class WakeUpRequestActivity extends AppCompatActivity {
                 startService(acceptServiceIntent);
 
 
+            }
+        });
+
+        btnCancelService.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                finish();
             }
         });
     }
@@ -213,6 +223,7 @@ public class WakeUpRequestActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         failedSnackbar.dismiss();
+                        finish();
 
                     }
                 });

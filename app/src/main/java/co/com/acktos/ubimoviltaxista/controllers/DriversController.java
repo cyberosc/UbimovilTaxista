@@ -2,11 +2,14 @@ package co.com.acktos.ubimoviltaxista.controllers;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
 import com.google.gson.Gson;
 
 import org.json.JSONException;
@@ -16,6 +19,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import co.com.acktos.ubimoviltaxista.R;
 import co.com.acktos.ubimoviltaxista.android.Encrypt;
 import co.com.acktos.ubimoviltaxista.android.InternalStorage;
 import co.com.acktos.ubimoviltaxista.app.AppController;
@@ -35,11 +39,13 @@ public class DriversController {
     //Constants
     public final static String TAG_DRIVER_LOGIN="driver_login";
     public final static String TAG_ASSIGN_SERVICE="assign_service";
+    public final static String TAG_ADD_CREDIT="add_credit";
 
     public DriversController(Context context) {
         this.context = context;
         internalStorage = new InternalStorage(this.context);
         gson=new Gson();
+        Firebase.setAndroidContext(context);
 
     }
 
@@ -168,7 +174,6 @@ public class DriversController {
 
 
         final Driver driver=getDriver();
-        final String carId="1";
 
         if(driver!=null){
             StringRequest jsonObjReq = new StringRequest(
@@ -191,7 +196,7 @@ public class DriversController {
                                 responseListener.onResponse(Config.SUCCESS_CODE);
 
 
-                            }if(serverResponse.getCode().equals(Config.SERVICE_ALREADY_TAKEN)){
+                            }else if(serverResponse.getCode().equals(Config.SERVICE_ALREADY_TAKEN)){
 
                                 responseListener.onResponse(Config.SERVICE_ALREADY_TAKEN);
 
@@ -222,6 +227,162 @@ public class DriversController {
                     params.put(Config.KEY_ID, driver.getId());
                     params.put(Config.KEY_SERVICE, serviceId);
                     params.put(Config.KEY_ENCRYPT, Encrypt.md5(driver.getId()+ serviceId + Config.TOKEN));
+
+                    return params;
+                }
+
+            };
+
+            // Adding request to request queue
+            AppController.getInstance().addToRequestQueue(jsonObjReq, TAG_ASSIGN_SERVICE);
+
+        }else{
+            Log.i(Config.DEBUG_TAG,"Driver is null in assign driver-DriversController");
+        }
+
+    }
+
+    public void addCredit(final String code,
+                          final Response.Listener<String> responseListener,
+                          final Response.ErrorListener errorListener){
+
+        final Driver driver=getDriver();
+
+
+        StringRequest jsonObjReq = new StringRequest(
+
+                Request.Method.POST,
+                Config.API.DRIVER_LOGIN.getUrl(),
+                new Response.Listener<String>() {
+
+                    @Override
+                    public void onResponse(String response) {
+
+                        Log.d(Config.DEBUG_TAG,"sendAlarm response" + response.toString());
+
+                        ServerResponse serverResponse = new ServerResponse(response);
+
+                        if (serverResponse.getCode().equals(Config.SUCCESS_CODE)) {
+
+
+                            responseListener.onResponse(Config.SUCCESS_CODE);
+
+
+                        } else {
+                            responseListener.onResponse(Config.FAILED_CODE);
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                        Log.d(Config.DEBUG_TAG, "volley error add credit:" + error.getMessage());
+                        errorListener.onErrorResponse(error);
+                    }
+                }) {
+
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put(Config.KEY_DRIVER_ID, driver.getId());
+                params.put(Config.KEY_CODE, code);
+                params.put(Config.KEY_ENCRYPT, Encrypt.md5(driver.getId()+code + Config.TOKEN));
+
+                return params;
+            }
+
+        };
+
+        // Adding request to request queue
+        AppController.getInstance().addToRequestQueue(jsonObjReq, TAG_ADD_CREDIT);
+
+
+    }
+
+    public void sendAlarm(){
+
+        final Driver driver=getDriver();
+        Firebase driversRef=new Firebase("https://ubimovil.firebaseio.com/"+Config.TABLE_ALARMS);
+        driversRef.child(Config.KEY_DRIVER+driver.getId())
+                .child(Config.KEY_PANIC)
+                .setValue("1", new Firebase.CompletionListener() {
+
+                    @Override
+                    public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+
+                        if (firebaseError != null) {
+                            Toast.makeText(
+                                    context,context.getString(R.string.msg_error_occurred),Toast.LENGTH_LONG).show();
+                        } else {
+                            Log.i(Config.DEBUG_TAG, "onComplete firebase panic: Panic message don't could sent");
+
+                            Toast.makeText(
+                                    context, context.getString(R.string.msg_alarm_acive), Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+    }
+
+
+    public void registerGCMIdOnBackend(final String registerId,
+                                       final Response.Listener<String> responseListener,
+                                       final Response.ErrorListener errorListener) {
+
+
+        final Driver driver=getDriver();
+
+
+        if(driver!=null){
+            StringRequest jsonObjReq = new StringRequest(
+
+                    Request.Method.POST,
+                    Config.API.REGISTER_GCM_ID.getUrl(),
+                    new Response.Listener<String>() {
+
+                        @Override
+                        public void onResponse(String response) {
+
+                            Log.d(Config.DEBUG_TAG, response.toString());
+
+                            ServerResponse serverResponse = new ServerResponse(response);
+
+                            Log.i(Config.DEBUG_TAG,"register gcm id:"+response);
+
+                            if (serverResponse.getCode().equals(Config.SUCCESS_CODE)) {
+
+                                responseListener.onResponse(Config.SUCCESS_CODE);
+
+
+                            } else {
+                                responseListener.onResponse(Config.FAILED_CODE);
+                            }
+
+                        }
+                    },
+                    new Response.ErrorListener() {
+
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+
+                            Log.d(Config.DEBUG_TAG, "volley error register gcm id:" + error.getMessage());
+                            errorListener.onErrorResponse(error);
+                        }
+                    }) {
+
+                @Override
+                protected Map<String, String> getParams() {
+
+                    //Log.i(Config.DEBUG_TAG, "id:" + driver.getId());
+                    //Log.i(Config.DEBUG_TAG, "car:" + carId);
+                    //Log.i(Config.DEBUG_TAG, "service:" + "1");
+
+                    Map<String, String> params = new HashMap<>();
+                    params.put(Config.KEY_DRIVER_ID, driver.getId());
+                    params.put(Config.KEY_GCM_ID, registerId);
+                    params.put(Config.KEY_ENCRYPT, Encrypt.md5(driver.getId()+ registerId + Config.TOKEN));
 
                     return params;
                 }

@@ -1,36 +1,32 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     tools:context="co.com.acktos.ubimoviltaxista.presentation.LoginActivity">
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/city" />
-
-
 
     <ScrollView
         android:id="@+id/login_form"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/color_amber"
         android:paddingBottom="@dimen/activity_vertical_margin"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin">
 
 
-
-        <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:card_view="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/card_order"
+        <LinearLayout
+            android:id="@+id/email_login_form"
             android:layout_width="match_parent"
-            android:layout_gravity="center_vertical"
-            android:layout_height="wrap_content"
-            card_view:cardCornerRadius="4dp">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingEnd="28dp"
+            android:paddingLeft="28dp"
+            android:paddingRight="28dp"
+            android:paddingStart="28dp">
 
             <!-- Login progress -->
             <ProgressBar
@@ -38,66 +34,61 @@
                 style="?android:attr/progressBarStyleLarge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|center_vertical"
                 android:layout_marginBottom="@dimen/activity_vertical_margin"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:visibility="gone"
-                android:layout_gravity="center_horizontal|center_vertical"/>
+                android:visibility="gone" />
 
-            <LinearLayout
-                android:id="@+id/email_login_form"
+
+            <ImageView
+                android:layout_width="231dp"
+                android:layout_height="36dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="50dp"
+                android:layout_marginTop="100dp"
+                android:src="@drawable/logo_ubimovil_white" />
+
+
+            <TextView
+                android:id="@+id/txt_login_status"
+                style="@style/Base.TextAppearance.AppCompat.Small"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingLeft="28dp"
-                android:paddingRight="28dp"
-                android:paddingStart="28dp"
-                android:paddingEnd="28dp"
-                android:orientation="vertical">
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"
+                android:text="Conectando..."
+                android:textColor="@color/colorSecondaryText"
+                android:visibility="invisible" />
 
-                <!-- <TextView
-                     android:layout_width="match_parent"
-                     android:layout_height="wrap_content"
-                     android:textSize="38sp"
-                     android:textStyle="bold"
-                     android:textColor="@color/colorPrimaryLight"
-                     android:text="@string/transporter"
-                     android:gravity="center_horizontal"
-                     android:layout_marginBottom="30dp"/>-->
-                
+
+            <android.support.v7.widget.GridLayout
+
+                android:id="@+id/content_distance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:columnCount="7"
+                app:orientation="horizontal"
+                app:rowCount="2">
+
                 <ImageView
-                    android:layout_width="160dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/logo_ubimovil"
-                    android:layout_marginTop="@dimen/activity_horizontal_margin"
-                    android:layout_marginBottom="@dimen/margin_bottom_logo_sign_in"
-                    android:layout_gravity="center_horizontal" />
-               <!-- <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="Sing In"
-                    android:id="@+id/textView"
-                    android:paddingTop="9dp"
-                    android:paddingBottom="5dp"
-                    android:textStyle="bold"
-                    android:layout_gravity="center_horizontal" />-->
 
-                <TextView
-                    android:id="@+id/txt_login_status"
-                    style="@style/Base.TextAppearance.AppCompat.Small"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginBottom="16dp"
-                    android:gravity="center_horizontal"
-                    android:text="Conectando con google..."
-                    android:textColor="@color/colorDivider"
-                    android:visibility="gone" />
-
+                    android:src="@drawable/ic_email_24dp"
+                    android:tint="@color/white"
+                    android:layout_height="45dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="10dp"
+                    app:layout_gravity="center"
+                    app:layout_column="0"
+                    app:layout_columnWeight="1"
+                    app:layout_row="0" />
 
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/content_email"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp">
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    app:layout_column="1"
+                    app:layout_columnWeight="6"
+                    app:layout_row="0">
 
                     <EditText
                         android:id="@+id/txt_email"
@@ -110,10 +101,25 @@
 
                 </android.support.design.widget.TextInputLayout>
 
+                <ImageView
+
+                    android:src="@drawable/ic_vpn_key_24dp"
+                    android:tint="@color/white"
+                    android:layout_height="45dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="10dp"
+                    app:layout_gravity="center"
+                    app:layout_column="0"
+                    app:layout_columnWeight="1"
+                    app:layout_row="1" />
+
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/content_password"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp">
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    app:layout_column="1"
+                    app:layout_columnWeight="6"
+                    app:layout_row="1">
 
                     <EditText
                         android:id="@+id/txt_pswrd"
@@ -129,19 +135,30 @@
 
                 </android.support.design.widget.TextInputLayout>
 
-                <Button
-                    android:id="@+id/btn_login"
-                    android:theme="@style/MainButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/activity_vertical_margin"
-                    android:layout_marginTop="@dimen/activity_vertical_margin"
-                    android:text="@string/login"
-                    android:textStyle="bold"/>
-                    <!--style="?android:textAppearanceSmall"-->
+            </android.support.v7.widget.GridLayout>
+
+            <Button
+                android:id="@+id/btn_login"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginTop="50dp"
+                android:text="@string/login"
+                android:textStyle="bold"
+                android:theme="@style/MainButton" />
+
+            <TextView
+                style="?android:textAppearanceSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center_horizontal"
+                android:text="@string/forgot_password"
+                android:textColor="@color/colorAccent" />
+            <!--style="?android:textAppearanceSmall"-->
 
 
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
+        </LinearLayout>
+
     </ScrollView>
 </FrameLayout>

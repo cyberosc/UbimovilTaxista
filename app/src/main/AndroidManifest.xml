@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="co.com.acktos.ubimoviltaxista.permission.C2D_MESSAGE" />
 
@@ -74,11 +75,7 @@
             android:name=".presentation.LoginActivity"
             android:label="@string/title_activity_login"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".presentation.FullscreenActivity"
@@ -97,7 +94,23 @@
         <activity
             android:name=".presentation.BlanckActivity"
             android:label="@string/title_activity_blanck"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <service
+            android:name=".services.SendAlarmService"
+            android:exported="false" />
+
+        <activity
+            android:name=".presentation.NavigationActivity"
+            android:label="@string/title_activity_navigation"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
     </application>
 
 </manifest>

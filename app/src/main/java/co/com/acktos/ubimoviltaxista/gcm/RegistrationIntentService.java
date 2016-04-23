@@ -7,6 +7,8 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
@@ -15,12 +17,14 @@ import java.io.IOException;
 
 import co.com.acktos.ubimoviltaxista.R;
 import co.com.acktos.ubimoviltaxista.app.Config;
+import co.com.acktos.ubimoviltaxista.controllers.DriversController;
 
 /**
  * Created by Acktos on 2/10/16.
  */
 public class RegistrationIntentService extends IntentService {
 
+    private DriversController driversController;
 
     public RegistrationIntentService() {
         super("RegistrationIntentService");
@@ -28,19 +32,19 @@ public class RegistrationIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+
+
+        driversController=new DriversController(this);
+
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         try {
-            // [START register_for_gcm]
-            // Initially this call goes out to the network to retrieve the token, subsequent calls
-            // are local.
-            // R.string.gcm_defaultSenderId (the Sender ID) is typically derived from google-services.json.
-            // See https://developers.google.com/cloud-messaging/android/start for details on this file.
-            // [START get_token]
+
             InstanceID instanceID = InstanceID.getInstance(this);
             String token = instanceID.getToken(getString(R.string.gcm_defaultSenderId),
                     GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
-            // [END get_token]
+
+
             Log.i(Config.DEBUG_TAG, "GCM Registration Token: " + token);
 
             // TODO: Implement this method to send any registration to your app's servers.
@@ -74,7 +78,23 @@ public class RegistrationIntentService extends IntentService {
      * @param token The new token.
      */
     private void sendRegistrationToServer(String token) {
-        // Add custom implementation, as needed.
+
+        driversController.registerGCMIdOnBackend(token, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String result) {
+                if(result.equals(Config.SUCCESS_CODE)){
+                    Log.i(Config.DEBUG_TAG,"Register id saved successFully");
+                }else{
+                    Log.i(Config.DEBUG_TAG,"Register id couldn't be saved");
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+
+            }
+        });
     }
 
     /**

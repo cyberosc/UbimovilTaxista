@@ -160,6 +160,9 @@ public class UpdateCurrentPositionService extends IntentService implements Googl
 
         Map<String, String> driverMap = new HashMap<String, String>();
 
+        if(mLastLocation!=null){
+
+
         driverMap.put(Config.KEY_LAST_LOCATION, mLastLocation.getLatitude()+","+mLastLocation.getLongitude());
         driverMap.put(Config.KEY_CITY, "Bogota");
         driverMap.put(Config.KEY_UPDATE_DATE, ts);
@@ -181,6 +184,10 @@ public class UpdateCurrentPositionService extends IntentService implements Googl
 
         }
 
+        }else{
+
+            Log.i(Config.DEBUG_TAG, "savePositionOnFirebase: mLastLocation is null");
+        }
 
     }
 
